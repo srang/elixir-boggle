@@ -1,9 +1,9 @@
 <div >
   <table>
-    <%= for number <- 1..4 do %>
+    <%= for row_num <- 1..@board_size do %>
       <tr>
-        <%= for number <- 1..4 do %>
-          <td><%= String.at(@boggle, number*number) %></td>
+        <%= for col_num <- 1..@board_size do %>
+          <td><%= Enum.at(@boggle_str, ((row_num-1)*@board_size + col_num)-1) %></td>
         <% end %>
       </tr>
     <% end %>
