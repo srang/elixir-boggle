@@ -1,0 +1,11 @@
+<div >
+  <table>
+    <%= for number <- 1..4 do %>
+      <tr>
+        <%= for number <- 1..4 do %>
+          <td><%= String.at(@boggle, number*number) %></td>
+        <% end %>
+      </tr>
+    <% end %>
+  </table>
+</div>

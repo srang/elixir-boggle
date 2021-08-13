@@ -19,6 +19,7 @@ defmodule BoggleWeb.Router do
     get "/", PageController, :index
     get "/hello", HelloController, :index
     get "/hello/:messenger", HelloController, :greet
+    get "/boggle", BoggleController, :index
   end
 
   # Other scopes may use custom stacks.
