@@ -1,9 +1,11 @@
-<div >
-  <table>
+<div>
+  <table class="boggle-board">
     <%= for row_num <- 1..@board_size do %>
       <tr>
         <%= for col_num <- 1..@board_size do %>
-          <td><%= Enum.at(@boggle_str, ((row_num-1)*@board_size + col_num)-1) %></td>
+          <td class="boggle-cell">
+            <%= Enum.at(@boggle_str, ((row_num-1)*@board_size + col_num)-1) %>
+          </td>
         <% end %>
       </tr>
     <% end %>

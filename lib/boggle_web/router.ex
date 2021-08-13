@@ -23,9 +23,10 @@ defmodule BoggleWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", BoggleWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", BoggleWeb do
+    pipe_through :api
+    get "/check/:word", BoggleController, :word_on_board
+  end
 
   # Enables LiveDashboard only for development
   #
