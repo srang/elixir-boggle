@@ -28,9 +28,8 @@ defmodule BoggleWeb.WordChannel do
   end
 
   defp word_on_board?(word, boggle_str) do
-    result = BoggleBoard.word_on_board?(word, boggle_str) #&& Lexicon.word_status(@lexicon, word)
-    IO.inspect(result, label: "word_channel")
-    result
+    BoggleBoard.word_on_board?(word, boggle_str)
+      && Lexicon.word_status(@lexicon, word)
   end
 
 end

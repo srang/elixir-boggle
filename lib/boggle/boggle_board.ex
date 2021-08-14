@@ -8,10 +8,7 @@ defmodule Boggle.BoggleBoard do
     board_size = get_board_size(boggle_str)
     Enum.any?(0..(board_size-1), fn row ->
       Enum.any?(0..(board_size-1), fn col ->
-        IO.puts("#{boggle_str}, #{row}, #{col}")
-        res = boggle_helper(word, board_size, boggle_str, [], "", row, col, 0)
-        IO.inspect(res, label: "boggle_board")
-        res
+        boggle_helper(word, board_size, boggle_str, [], "", row, col, 0)
       end )
     end )
   end
@@ -19,22 +16,17 @@ defmodule Boggle.BoggleBoard do
   defp boggle_helper(word, board_size, boggle_str, used_cells, current_str, row, col, idx) when idx <= board_size*board_size do
     delta = [{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}]
     cur_cell = row*board_size+col
-    IO.puts("cell: #{row} #{col} #{cur_cell}, idx: #{idx} #{String.length(word)} string: #{current_str} char: #{String.at(word, idx) } bog: #{String.at(boggle_str, cur_cell)}
-            cell used: #{Enum.member?(used_cells, cur_cell)}
-            end of word: #{idx >= String.length(word)}")
-    # coord invalid: #{row < 0 || col < 0 || row >= board_size || col >= board_size}
-    # idx invalid: #{idx == board_size*board_size}
-    !(idx >= String.length(word)) # and not at end of word
-      && !(row < 0 || col < 0 || row >= board_size || col >= board_size || idx == board_size*board_size) # not invalid
+    !(idx >= String.length(word)) # not at end of word
+      && !(row < 0 || col < 0 || row >= board_size || col >= board_size || idx == board_size*board_size) # and not invalid index
       && !(Enum.member?(used_cells, cur_cell)) # and not reused cell
       && ((String.at(word, idx) |> String.upcase()) == String.at(boggle_str, cur_cell)) # and current character matches
-      && Enum.any?(delta, fn {x, y} ->
+      && Enum.any?(delta, fn {x, y} -> # test next cell
         boggle_helper(word, board_size, boggle_str,
           [cur_cell | used_cells],
           current_str <> String.at(boggle_str, cur_cell),
           row+x, col+y, idx+1)
         end)
-        || idx >= String.length(word)
+      || idx >= String.length(word) # or return success
   end
 
 
