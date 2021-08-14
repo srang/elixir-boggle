@@ -1,5 +1,8 @@
 defmodule BoggleWeb.WordChannel do
   use BoggleWeb, :channel
+  alias Boggle.{BoggleBoard, Lexicon}
+  @lexicon Lexicon.get_lexicon("assets/static/bogwords_short.txt")
+
   @impl true
   def join("game:default", payload, socket) do
     if authorized?(payload) do
@@ -17,9 +20,8 @@ defmodule BoggleWeb.WordChannel do
   # Channels can be used in a request/response fashion
   # by sending replies to requests from the client
   @impl true
-  def handle_in("word", payload, socket) do
-    # Chat.Message.changeset(%Chat.Message{}, payload) |> Chat.Repo.insert()
-    broadcast(socket, "word", payload)
+  def handle_in("word", %{"word" => word}, socket) do
+    broadcast(socket, "word", %{"word": word, "onBoard": word_on_board?(word)})
     {:noreply, socket}
   end
 
@@ -32,6 +34,10 @@ defmodule BoggleWeb.WordChannel do
   def handle_info(:after_join, socket) do
     push socket, "join", %{status: "connected"}
     {:noreply, socket}
+  end
+
+  defp word_on_board?(word) do
+    is_word = Lexicon.is_word?(@lexicon, word)
   end
 
 end
