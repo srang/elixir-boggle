@@ -6,10 +6,12 @@ defmodule Boggle.BoggleBoard do
 
   def word_on_board?(word, boggle_str) do
     board_size = get_board_size(boggle_str)
-    Enum.each(0..(board_size-1), fn row ->
-      Enum.each(0..(board_size-1), fn col ->
-        boggle_helper(word, board_size, boggle_str, [], "", row, col, 0) && IO.puts("FOUND #{word} starting at #{row}, #{col}")
-        IO.puts("here")
+    Enum.any?(0..(board_size-1), fn row ->
+      Enum.any?(0..(board_size-1), fn col ->
+        IO.puts("#{boggle_str}, #{row}, #{col}")
+        res = boggle_helper(word, board_size, boggle_str, [], "", row, col, 0)
+        IO.inspect(res, label: "boggle_board")
+        res
       end )
     end )
   end
@@ -17,13 +19,13 @@ defmodule Boggle.BoggleBoard do
   defp boggle_helper(word, board_size, boggle_str, used_cells, current_str, row, col, idx) when idx <= board_size*board_size do
     delta = [{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}]
     cur_cell = row*board_size+col
-    #  coord invalid: #{row < 0 || col < 0 || row >= board_size || col >= board_size} 
-    #  & idx invalid: #{idx == board_size*board_size} 
-    #  & end of word: #{idx >= String.length(word)} 
-    #  & cell used: #{Enum.member?(used_cells, cur_cell)}")
-    IO.puts("row: #{row}, col: #{col}, idx: #{idx} #{String.length(word)} string: #{current_str} used: #{used_cells} char: #{String.at(word, idx) } bog: #{String.at(boggle_str, cur_cell)}")
-    !(row < 0 || col < 0 || row >= board_size || col >= board_size || idx == board_size*board_size) # not invalid
-      && !(idx >= String.length(word)) # and not at end of word
+    IO.puts("cell: #{row} #{col} #{cur_cell}, idx: #{idx} #{String.length(word)} string: #{current_str} char: #{String.at(word, idx) } bog: #{String.at(boggle_str, cur_cell)}
+            cell used: #{Enum.member?(used_cells, cur_cell)}
+            end of word: #{idx >= String.length(word)}")
+    # coord invalid: #{row < 0 || col < 0 || row >= board_size || col >= board_size}
+    # idx invalid: #{idx == board_size*board_size}
+    !(idx >= String.length(word)) # and not at end of word
+      && !(row < 0 || col < 0 || row >= board_size || col >= board_size || idx == board_size*board_size) # not invalid
       && !(Enum.member?(used_cells, cur_cell)) # and not reused cell
       && ((String.at(word, idx) |> String.upcase()) == String.at(boggle_str, cur_cell)) # and current character matches
       && Enum.any?(delta, fn {x, y} ->
@@ -32,6 +34,7 @@ defmodule Boggle.BoggleBoard do
           current_str <> String.at(boggle_str, cur_cell),
           row+x, col+y, idx+1)
         end)
+        || idx >= String.length(word)
   end
 
 

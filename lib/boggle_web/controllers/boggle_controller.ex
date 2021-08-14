@@ -5,7 +5,6 @@ defmodule BoggleWeb.BoggleController do
   def index(conn, _params) do
     board_size = 2
     boggle_str = BoggleBoard.new_board(board_size)
-    IO.inspect(@lexicon)
     render(conn, "boggle.html", boggle_str: boggle_str, board_size: board_size)
   end
 end
