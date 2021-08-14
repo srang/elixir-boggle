@@ -1,72 +1,57 @@
-// We need to import the CSS so that webpack will load it.
-// The MiniCssExtractPlugin is used to separate it out into
-// its own CSS file.
 import "../css/app.css"
 
-// webpack automatically bundles all modules in your
-// entry points. Those entry points can be configured
-// in "webpack.config.js".
-//
-// Import deps with the dep name or local files with a relative path, for example:
-//
-     import {Socket} from "phoenix"
+import {Socket} from "phoenix"
 //import socket from "./socket"
-//
 import "phoenix_html"
-import $ from "jquery"
-class App {
 
-  static init(){
-    let socket = new Socket("/socket", {
-      logger: ((kind, msg, data) => { console.log(`${kind}: ${msg}`, data) })
-    })
+let socket = new Socket("/socket", {})
+socket.connect()
 
-    socket.connect({user_id: "123"})
-    var $status    = $("#status")
-    var $messages  = $("#messages")
-    var $input     = $("#message-input")
-    var $username  = $("#username")
+let channel = socket.channel('game:default', {}); // connect to chat "room"
 
-    socket.onOpen( ev => console.log("OPEN", ev) )
-    socket.onError( ev => console.log("ERROR", ev) )
-    socket.onClose( e => console.log("CLOSE", e))
+channel.on('word', function (payload) {
+  let li = document.createElement("li");
+  li.innerHTML = payload.message; // set li contents
+  ul.appendChild(li);                    // append to list
+  scrollToBottom();
+});
 
-    var chan = socket.channel("game:default", {})
-    chan.join().receive("ignore", () => console.log("auth error"))
-               .receive("ok", () => console.log("join ok"))
-               .after(10000, () => console.log("Connection interruption"))
-    chan.onError(e => console.log("something went wrong", e))
-    chan.onClose(e => console.log("channel closed", e))
+channel.join(); // join the channel.
 
-    $input.off("keypress").on("keypress", e => {
-      if (e.keyCode == 13) {
-        chan.push("new:msg", {user: $username.val(), body: $input.val()})
-        $input.val("")
-      }
-    })
 
-    chan.on("new:msg", msg => {
-      $messages.append(this.messageTemplate(msg))
-      scrollTo(0, document.body.scrollHeight)
-    })
+let ul = document.getElementById('messages');        // list of messages.
+let msg = document.getElementById('message-input');            // message input field
 
-    chan.on("user:entered", msg => {
-      var username = this.sanitize(msg.user || "anonymous")
-      $messages.append(`<br/><i>[${username} entered]</i>`)
-    })
+// "listen" for the [Enter] keypress event to send a message:
+msg.addEventListener('keypress', function (event) {
+  if (event.keyCode == 13 && msg.value.length > 0) { // don't sent empty msg.
+    channel.push('word', { // send the message to the server on "shout" channel
+      message: sanitise(msg.value)    // get message text (value) from msg input field.
+    });
+    msg.value = '';         // reset the message input field for next message.
   }
+});
 
-  static sanitize(html){ return $("<div/>").text(html).html() }
-
-  static messageTemplate(msg){
-    let username = this.sanitize(msg.user || "anonymous")
-    let body     = this.sanitize(msg.body)
-
-    return(`<p><a href='#'>[${username}]</a>&nbsp; ${body}</p>`)
-  }
-
+let scrollingElement = (document.scrollingElement || document.body)
+function scrollToBottom () {
+  scrollingElement.scrollTop = scrollingElement.scrollHeight;
 }
 
-$( () => App.init() )
-
-export default App
+/**
+ * sanitise input to avoid XSS see: https://git.io/fjpGZ
+ * function borrowed from: https://stackoverflow.com/a/48226843/1148249
+ * @param {string} str - the text to be sanitised.
+ * @return {string} str - the santised text
+ */
+function sanitise(str) {
+  const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#x27;',
+      "/": '&#x2F;',
+  };
+  const reg = /[&<>"'/]/ig;
+  return str.replace(reg, (match)=>(map[match]));
+}
