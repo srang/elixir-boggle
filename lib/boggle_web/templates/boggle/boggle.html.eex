@@ -1,3 +1,4 @@
+<div id="boggle-string" hidden><%= @boggle_str %></div>
 <div>
   <table class="boggle-board">
     <%= for row_num <- 1..@board_size do %>

@@ -3,6 +3,28 @@ defmodule Boggle.BoggleBoard do
     boggle_letter(board_size*board_size, [], boggle_dice(board_size))
   end
 
+  def word_on_board?(_word, boggle_str) do
+    boggle_board = String.graphemes(boggle_str)
+      |> Enum.map(fn a -> %{:letter => a, :used => 1} end )
+
+    board_size = trunc(:math.sqrt(String.length(boggle_str)))
+    Enum.each(0..(board_size-1), fn row ->
+      Enum.each(0..(board_size-1), fn col ->
+        IO.puts("#{row}, #{col}")
+        #boggle_helper(word, boggle_board, "", row, col, board_size*board_size)
+      end )
+    end )
+  end
+
+  defp boggle_helper(word, boggle_str, current_str, row, col, idx) do
+    IO.puts("#{word}, #{row}, #{col}, #{idx}")
+    boggle_helper(word, boggle_str, current_str, row, col, idx-1)
+  end
+
+  defp boggle_helper(_word, _boggle_str, _row, _col, 0) do
+    :false
+  end
+
   defp boggle_letter(die_idx, boggle_str, dice) when die_idx > 0 do
     letter = String.at(Enum.at(dice, die_idx-1), Enum.random(0..5))
     letter = case letter do
@@ -30,5 +52,4 @@ defmodule Boggle.BoggleBoard do
                           "FIPRSY", "GORRVW", "HIPRRY", "NOOTUW", "OOOTTU" ])
     end
   end
-
 end

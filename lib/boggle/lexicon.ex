@@ -6,7 +6,7 @@ defmodule Boggle.Lexicon do
             |> Enum.to_list()
   end
 
-  def is_word?(lexicon, word) do
+  def word_status(lexicon, word) do
     Enum.member?(lexicon, word)
   end
 end

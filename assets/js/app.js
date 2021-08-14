@@ -22,11 +22,13 @@ channel.onClose(e => console.log("channel closed", e));
 
 let ul = document.getElementById('messages');
 let msg = document.getElementById('message-input');
+let boggle_str = document.getElementById('boggle-string');
 
 msg.addEventListener('keypress', function (event) {
   if (event.keyCode == 13 && msg.value.length > 0) {
     channel.push('word', {
-      word: sanitise(msg.value)
+      word: sanitise(msg.value),
+      boggle_str: sanitise(boggle_str.textContent)
     });
     msg.value = '';
   }
