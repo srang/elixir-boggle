@@ -1,32 +1,37 @@
 defmodule Boggle.BoggleBoard do
+
   def new_board(board_size) do
     boggle_letter(board_size*board_size, [], boggle_dice(board_size))
   end
 
   def word_on_board?(word, boggle_str) do
-    boggle_board = String.graphemes(boggle_str)
-      |> Enum.map(fn a -> %{:letter => a, :used => :false} end )
-
     board_size = get_board_size(boggle_str)
     Enum.each(0..(board_size-1), fn row ->
       Enum.each(0..(board_size-1), fn col ->
-        boggle_helper(word, board_size, boggle_board, "", row, col, 0)
+        boggle_helper(word, board_size, boggle_str, [], "", row, col, 0) && IO.puts("FOUND #{word} starting at #{row}, #{col}")
+        IO.puts("here")
       end )
     end )
   end
 
-  defp boggle_helper(word, board_size, boggle_board, current_str, row, col, idx) when idx <= board_size*board_size do
+  defp boggle_helper(word, board_size, boggle_str, used_cells, current_str, row, col, idx) when idx <= board_size*board_size do
     delta = [{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}]
-    IO.puts("current run - row: #{row}, col: #{col}, idx: #{idx} &
-      coord invalid: #{row < 0 || col < 0 || row >= board_size || col >= board_size} & idx invalid: #{idx == board_size*board_size} & end of word: #{idx >= String.length(word)} &
-      cell used: #{Enum.at(boggle_board, row*board_size+col) |> Map.fetch!(:used)}")
+    cur_cell = row*board_size+col
+    #  coord invalid: #{row < 0 || col < 0 || row >= board_size || col >= board_size} 
+    #  & idx invalid: #{idx == board_size*board_size} 
+    #  & end of word: #{idx >= String.length(word)} 
+    #  & cell used: #{Enum.member?(used_cells, cur_cell)}")
+    IO.puts("row: #{row}, col: #{col}, idx: #{idx} #{String.length(word)} string: #{current_str} used: #{used_cells} char: #{String.at(word, idx) } bog: #{String.at(boggle_str, cur_cell)}")
     !(row < 0 || col < 0 || row >= board_size || col >= board_size || idx == board_size*board_size) # not invalid
       && !(idx >= String.length(word)) # and not at end of word
-      && !(Enum.at(boggle_board, row*board_size+col) |> Map.fetch!(:used)) && boggle_board = Enum.map(boggle_board, 
-      && Enum.map(delta, fn {x, y} ->
-        boggle_helper(word, board_size, boggle_board, current_str, row+x, col+y, idx+1) end)
-    #IO.puts("cell used: #{Enum.at(boggle_board, row*board_size+col) |> Map.fetch(:used)}")
-    #IO.puts("end of word: #{idx >= String.length(word)}")
+      && !(Enum.member?(used_cells, cur_cell)) # and not reused cell
+      && ((String.at(word, idx) |> String.upcase()) == String.at(boggle_str, cur_cell)) # and current character matches
+      && Enum.any?(delta, fn {x, y} ->
+        boggle_helper(word, board_size, boggle_str,
+          [cur_cell | used_cells],
+          current_str <> String.at(boggle_str, cur_cell),
+          row+x, col+y, idx+1)
+        end)
   end
 
 
