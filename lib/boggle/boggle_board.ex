@@ -13,11 +13,11 @@ defmodule Boggle.BoggleBoard do
     end )
   end
 
-  defp boggle_helper(word, board_size, boggle_str, used_cells, current_str, row, col, idx) when idx <= board_size*board_size do
+  defp boggle_helper(word, board_size, boggle_str, used_cells, current_str, row, col, idx) do
     delta = [{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}]
     cur_cell = row*board_size+col
-    !(idx >= String.length(word)) # not at end of word
-      && !(row < 0 || col < 0 || row >= board_size || col >= board_size || idx == board_size*board_size) # and not invalid index
+    !(end_of_word?(word, idx))
+      && !(invalid_loc(row, col, board_size) || idx >= board_size*board_size) # and not invalid index
       && !(Enum.member?(used_cells, cur_cell)) # and not reused cell
       && ((String.at(word, idx) |> String.upcase()) == String.at(boggle_str, cur_cell)) # and current character matches
       && Enum.any?(delta, fn {x, y} -> # test next cell
@@ -29,6 +29,13 @@ defmodule Boggle.BoggleBoard do
       || idx >= String.length(word) # or return success
   end
 
+  defp invalid_loc(row, col, board_size) do
+    row < 0 || col < 0 || row >= board_size || col >= board_size
+  end
+
+  defp end_of_word?(word, idx) do
+    idx >= String.length(word)
+  end
 
   defp boggle_letter(die_idx, boggle_str, dice) when die_idx > 0 do
     letter = String.at(Enum.at(dice, die_idx-1), Enum.random(0..5))
