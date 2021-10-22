@@ -1,0 +1,21 @@
+<div id="boggle-string" hidden><%= @boggle_str %></div>
+<div>
+  <table class="boggle-board">
+    <%= for row_num <- 1..@board_size do %>
+      <tr>
+        <%= for col_num <- 1..@board_size do %>
+          <td class="boggle-cell">
+            <%= Enum.at(@boggle_str, ((row_num-1)*@board_size + col_num)-1) %>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+  </table>
+</div>
+<div>
+</div>
+<div id="input">
+  Boggle Word: <input id="message-input" class="form-control" />
+</div>
+<div id="messages">
+</div>

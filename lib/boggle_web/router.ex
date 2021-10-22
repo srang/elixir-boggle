@@ -19,11 +19,13 @@ defmodule BoggleWeb.Router do
     get "/", PageController, :index
     get "/hello", HelloController, :index
     get "/hello/:messenger", HelloController, :greet
+    get "/boggle", BoggleController, :index
   end
 
-  # Other scopes may use custom stacks.
+  ## Other scopes may use custom stacks.
   # scope "/api", BoggleWeb do
   #   pipe_through :api
+  #   get "/check/:word", BoggleController, :word_on_board
   # end
 
   # Enables LiveDashboard only for development
